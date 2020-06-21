@@ -1,0 +1,7 @@
+SET BASIC to LEXICON().
+
+// creates a lexicon for TWR that will tell you max twr or current twr 
+SET BASIC["TWR"] to LEXICON().
+
+BASIC:TWR:add("MAX", {RETURN SHIP:AVAILABLETHRUST/SHIP:MASS.}).
+BASIC:TWR:add("CURRENT", {RETURN THROTTLE*SHIP:AVAILABLETHRUST/SHIP:MASS.}).

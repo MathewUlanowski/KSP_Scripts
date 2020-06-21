@@ -1,0 +1,2 @@
+RUN IMPORT("testlib").
+
