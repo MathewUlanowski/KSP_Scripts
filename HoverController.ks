@@ -1,7 +1,8 @@
 
 stage.
 // Import the functions from the HoverLib
-run HoverLib.
+run import("0:/Libs/HoverLib").
+run import("0:/Libs/GUImaker").
 
 // optional parameter to set the desired altitude upon calling the function
 PARAMETER DesiredAltitude is 0.
@@ -27,12 +28,21 @@ LOCAL AngleChangeHolder to {
 // GUI controller
 // most if not all of displayed values are displayed asynchronousely so ti will update as the value updates
 LOCAL HoverGui is GUI(400).
-LOCAL Header is HoverGui:addlabel("Hover GUI").
-    set Header:style:align to "CENTER".
-    set Header:style:hstretch to TRUE.
+
+set Header to StaticLabel(HoverGui, "hOVER GUI").
+set Header:style:align to "CENTER".
+set Header:style:hstretch to TRUE.
+
+
+// LOCAL Header is HoverGui:addlabel("Hover GUI").
+//     set Header:style:align to "CENTER".
+//     set Header:style:hstretch to TRUE.
 // displays the current altitude on the GUI 
-LOCAL TargetAlt is HoverGui:addlabel("Target ALT: " + round(DesiredAltitude,5)).
-set TargetAlt:textupdater to {RETURN "Target ALT: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).}.
+DynamicLabel(HoverGui, {
+    RETURN "Target Alt: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).
+}).
+// LOCAL TargetAlt is HoverGui:addlabel("Target ALT: " + round(DesiredAltitude,5)).
+// set TargetAlt:textupdater to {RETURN "Target ALT: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).}.
 // shows the altitude mode 
 LOCAL ModeLabel is HoverGui:addlabel("Mode: ").
 set ModeLabel:textupdater to {

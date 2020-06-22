@@ -1,8 +1,9 @@
-PARAMETER StagingMode is TRUE.
+PARAMETER Staging is TRUE.
 
+RUN import("0:/Libs/CommonTriggers").
 
-if StagingMode {
-    RUN StageController.
+if Staging {
+    LFO_Trigger().
 }
 
 IF HASNODE = TRUE {
@@ -14,8 +15,8 @@ IF HASNODE = TRUE {
     }
 }
 
-WHEN NEXTNODE:eta - TIME:seconds < NEXTNODE:burnvector:mag/((ship:maxthrust/ship:mass)/2)-10 AND WARP = 0 AND VectorFacing() = TRUE THEN {
-    WARPTO(Time:seconds+(NEXTNODE:eta-(NEXTNODE:burnvector:mag/(ship:maxthrust/ship:mass))/2)-30).
+WHEN NEXTNODE:eta - TIME:seconds < NEXTNODE:burnvector:mag/((ship:AVAILABLETHRUST/ship:mass)/2)-10 AND WARP = 0 AND VectorFacing() = TRUE THEN {
+    WARPTO(Time:seconds+(NEXTNODE:eta-(NEXTNODE:burnvector:mag/(ship:AVAILABLETHRUST/ship:mass))/2)-30).
 }
 
 SET completed TO FALSE.
@@ -57,7 +58,7 @@ function EXECUTEONENODE {
         SAS OFF.
         print(ROUND(NEXTNODE:burnvector:mag, 3)).
         WAIT UNTIL NEXTNODE:eta - 120.
-        if NEXTNODE:ETA < (NEXTNODE:burnvector:mag/(ship:maxthrust/ship:mass))/2{
+        if NEXTNODE:ETA < (NEXTNODE:burnvector:mag/(ship:AVAILABLETHRUST/ship:mass))/2{
             if NEXTNODE:burnvector:mag < 30{
                 lock throttle to 1*NEXTNODE:burnvector:mag/30.
             }

@@ -1,3 +1,6 @@
+run import("0:/Libs/CommonTriggers").
+run import("0:/Libs/GUImaker").
+
 declare parameter OrbInput is 200.
 DECLARE PARAMETER Class is 0.
 set OrbInput to OrbInput*1000.
@@ -14,10 +17,8 @@ if Class = 0 {
     }
 }
 
-WHEN STAGE:LIQUIDFUEL < 1 THEN {
-    STAGE.
-    RETURN TRUE.
-}
+LFO_Trigger().
+NewPopup("LFO staging enabled").
 
 WHEN SHIP:altitude > 65000 THEN {
     TOGGLE AG10.
@@ -82,7 +83,7 @@ function Mode1{
     set completed to false.
     set WARP to 0.
     wait 3.
-    WARPTO(Time:seconds+(NEXTNODE:eta-(NEXTNODE:burnvector:mag/(ship:maxthrust/ship:mass))/2)-30).
+    WARPTO(Time:seconds+(NEXTNODE:eta-(NEXTNODE:burnvector:mag/(ship:AVAILABLETHRUST/ship:mass))/2)-30).
     until completed = true{
         SAS OFF.
 
@@ -98,7 +99,7 @@ function Mode1{
         print("Apoapsis: "+ round(ship:apoapsis)).
         print("Periapsis: "+ round(ship:periapsis)).
         print(nextNode:burnvector:mag).
-        if nextNode:eta < (nextNode:burnvector:mag / (ship:maxThrust/ship:mass))/2  {
+        if nextNode:eta < (nextNode:burnvector:mag / (ship:AVAILABLETHRUST/ship:mass))/2  {
             if ship:apoapsis > OrbInput and ship:periapsis > OrbInput{
                 set completed to true.
                 LOCK throttle to 0.
