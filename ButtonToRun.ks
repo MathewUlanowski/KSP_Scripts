@@ -23,14 +23,15 @@ for item in AllFiles:list:values {
     AND not (item = "boot")
     AND NOT (item = "Libs"){
         LOCAL ItemIter to item.
-        CreateStaticButton(
+        CreateButton(
             SB,
             item,
             {
                 RUNPATH(ItemIter).
             }
         ).
-    }    
+    }
 }
 ButtonGUI:show().
 WAIT UNTIL COMPLETED or Handup.
+CLEARGUIS().

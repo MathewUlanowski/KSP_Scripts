@@ -1,12 +1,29 @@
 
 stage.
 // Import the functions from the HoverLib
-run import("0:/Libs/HoverLib").
-run import("0:/Libs/GUImaker").
+RUNPATH("0:/import", "0:/Libs/HoverLib").
+RUNPATH("0:/import", "0:/Libs/GUImaker").
+
+
 
 // optional parameter to set the desired altitude upon calling the function
 PARAMETER DesiredAltitude is 0.
 
+// Booleen tells weather or not to activate the steering controller this allows a higher scope to control the steering if for instance its being used for landing or something
+PARAMETER SteeringMode is TRUE.
+if SteeringMode {
+    RUNPATH("0:/Controllers/steeringController", TRUE).
+}
+
+// abort trigger is something to be passed in that if triggered will cause the program to end it should take a function.
+// ExitCondition must be set to true in your higer scope for it to end the script
+PARAMETER AbortTrigger is {
+    set ExitCondition to TRUE.
+    RETURN TRUE.
+}.
+AbortTrigger().
+
+PARAMETER LandingMode is False.
 // hovermode tells the program weather it is in Sea Level or Radar Mode
 PARAMETER HoverMode is 1.
 
@@ -14,9 +31,8 @@ PARAMETER HoverMode is 1.
 PARAMETER AltLock IS false.
 
 // sets landing mode to false by default once this is triggered it cannot be untriggered
-set LandingMode to FALSE.
 
-Local ExitCondition to FALSE.
+Set ExitCondition to FALSE.
 
 set Tilt to 85.
 
@@ -29,7 +45,7 @@ LOCAL AngleChangeHolder to {
 // most if not all of displayed values are displayed asynchronousely so ti will update as the value updates
 LOCAL HoverGui is GUI(400).
 
-set Header to StaticLabel(HoverGui, "hOVER GUI").
+set Header to StaticLabel(HoverGui, "Hover Info").
 set Header:style:align to "CENTER".
 set Header:style:hstretch to TRUE.
 
@@ -143,7 +159,7 @@ on AG5 {
 until ExitCondition {
     CLEARSCREEN.
 
-    set TWR to (THROTTLE * SHIP:MAXTHRUST)/ ship:MASS/(CONSTANT:g*(ship:body:mass/((ship:body:distance)^2))).
+    set TWR to (THROTTLE * SHIP:availablethrust)/ ship:MASS/(CONSTANT:g*(ship:body:mass/((ship:body:distance)^2))).
 
     // [WIP] detects if the brakes are on and attemts to arrest all horizontal velocity if they are
     if(BRAKES){
@@ -169,10 +185,6 @@ until ExitCondition {
             }
         }
     }
-    else {
-        UNLOCK steering.
-        CLEARVECDRAWS().
-    }
 
     // runs from the external lib functions
     if((VELOCITY:surface:mag > 1700) and (LandingMode = TRUE) and (ALTITUDE < 70000)){
@@ -185,3 +197,4 @@ until ExitCondition {
 
 HoverGui:hide().
 HoverGui:dispose().
+CLEARGUIS().

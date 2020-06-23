@@ -1,7 +1,14 @@
 // everything is handled based on TWR
 // this is because the way hover is handled is by maintainting a TWR of 1.0
-set GravDeltaV to CONSTANT:g*(ship:body:mass/((ship:body:distance)^2)).
-set Max_TWR to ship:maxthrust/ship:mass.
+
+set Max_TWR to ship:AVAILABLETHRUST/ship:mass.
+
+FUNCTION GravDeltaV {
+    RETURN CONSTANT:g*(ship:body:mass/((ship:body:distance)^2)).
+}.
+FUNCTION Current_TWR {
+    Return (THROTTLE*SHIP:availablethrust) / ship:mass/(CONSTANT:G*(SHIP:body:mass/((ship:body:distance)^2))).
+}
 
 FUNCTION Hover_Angle_Offset_TWR {
     Return 1/(Cos(VECTORANGLE(Up:vector, ship:FACING:forevector))).
@@ -14,7 +21,7 @@ FUNCTION Hover_Throttle {
     // if you want a perfectly level vertical hover
     Local PARAMETER Desired_Thrust_To_Weight is 1.
 
-    return ( Desired_Thrust_To_Weight * ship:mass * GravDeltaV/ship:MAXTHRUST ).
+    return ( Desired_Thrust_To_Weight * ship:mass * GravDeltaV()/ship:availablethrust ).
 }
 
 FUNCTION Velocity_TWR_Offset {
@@ -38,11 +45,11 @@ Function Altitude_TWR_Offset{
     PARAMETER Target_Altitude is 100.
     PARAMETER Mode is 1.
     if(Mode = 0){
-        LOCAL TargetVelocity to ((-1*ship:ALTITUDE)+Target_Altitude)/GravDeltaV.
+        LOCAL TargetVelocity to ((-1*ship:ALTITUDE)+Target_Altitude)/GravDeltaV().
         RETURN Velocity_TWR_Offset(TargetVelocity).
     }
     if(Mode = 1){
-        Local TargetVelocity to ((-1*ALT:radar)+Target_Altitude)/GravDeltaV.
+        Local TargetVelocity to ((-1*ALT:radar)+Target_Altitude)/GravDeltaV().
         RETURN Velocity_TWR_Offset(TargetVelocity).
     }
 }

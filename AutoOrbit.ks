@@ -24,6 +24,10 @@ WHEN SHIP:altitude > 65000 THEN {
     TOGGLE AG10.
 }
 
+WHEN SHIP:altitude > 300 THEN {
+    SET KUNIVERSE:timewarp:warp TO 4.
+}
+
 STAGE.
 
 //  to orbit 
