@@ -1,4 +1,6 @@
 PARAMETER Staging is TRUE.
+PARAMETER AbortTrigger is {return false.}.
+
 
 RUN import("0:/Libs/CommonTriggers").
 
@@ -6,14 +8,20 @@ if Staging {
     LFO_Trigger().
 }
 
+
+when AbortTrigger@:call() then{
+    print("Node Abort Triggered").
+    set completed to TRUE.
+}
 IF HASNODE = TRUE {
-    when NEXTNODE:BURNVECTOR:MAG <= 0.0001 then {
+    when NEXTNODE:BURNVECTOR:MAG <= 0.001 then {
         SET completed TO TRUE.
         LOCK THROTTLE TO 0.
         LOCK STEERING TO PROGRADE.
         SAS ON.
     }
 }
+
 
 WHEN NEXTNODE:eta - TIME:seconds < NEXTNODE:burnvector:mag/((ship:AVAILABLETHRUST/ship:mass)/2)-10 AND WARP = 0 AND VectorFacing() = TRUE THEN {
     WARPTO(Time:seconds+(NEXTNODE:eta-(NEXTNODE:burnvector:mag/(ship:AVAILABLETHRUST/ship:mass))/2)-30).
@@ -49,14 +57,13 @@ function EXECUTEONENODE {
     set warp to 0.
     WAIT 2.
     until completed = true {
-        print NEXTNODE:eta - TIME:second.
-        print VectorFacing.
-        PRINT SHIP:facing.
-        PRINT NEXTNODE:deltav:direction.
+        // print NEXTNODE:eta - TIME:second.
+        // print VectorFacing.
+        // PRINT SHIP:facing.
+        // PRINT NEXTNODE:deltav:direction.
+        // print(ROUND(NEXTNODE:burnvector:mag, 3)).
         lock Steering to Nextnode:burnvector:normalized.
-        CLEARSCREEN.
         SAS OFF.
-        print(ROUND(NEXTNODE:burnvector:mag, 3)).
         WAIT UNTIL NEXTNODE:eta - 120.
         if NEXTNODE:ETA < (NEXTNODE:burnvector:mag/(ship:AVAILABLETHRUST/ship:mass))/2{
             if NEXTNODE:burnvector:mag < 30{

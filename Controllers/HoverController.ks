@@ -12,7 +12,7 @@ PARAMETER DesiredAltitude is 0.
 // Booleen tells weather or not to activate the steering controller this allows a higher scope to control the steering if for instance its being used for landing or something
 PARAMETER SteeringMode is TRUE.
 if SteeringMode {
-    RUNPATH("0:/Controllers/steeringController", TRUE).
+    RUNPATH("0:/Controllers/steeringController").
 }
 
 // abort trigger is something to be passed in that if triggered will cause the program to end it should take a function.
@@ -54,6 +54,15 @@ set Header:style:hstretch to TRUE.
 //     set Header:style:align to "CENTER".
 //     set Header:style:hstretch to TRUE.
 // displays the current altitude on the GUI 
+set AltInput to CreateTextField(
+    HoverGui,
+    {
+        LOCAL parameter input is 0.
+        set DesiredAltitude@ to input:tonumber().
+        RETURN true.
+    },
+    DesiredAltitude:tostring()
+).
 DynamicLabel(HoverGui, {
     RETURN "Target Alt: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).
 }).
@@ -158,7 +167,6 @@ on AG5 {
 // repeating loop controlling the craft and its TWR and thrust to keep it hovering
 until ExitCondition {
     CLEARSCREEN.
-
     set TWR to (THROTTLE * SHIP:availablethrust)/ ship:MASS/(CONSTANT:g*(ship:body:mass/((ship:body:distance)^2))).
 
     // [WIP] detects if the brakes are on and attemts to arrest all horizontal velocity if they are

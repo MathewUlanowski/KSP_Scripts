@@ -1,20 +1,17 @@
 FUNCTION StaticLabel {
     LOCAL PARAMETER Parent.
     LOCAL PARAMETER Content.
-    SET Content TO Parent:addlabel(Content).
-    RETURN Content.
+    SET ContentLabel TO Parent:addlabel(Content).
+    RETURN ContentLabel.
 }
 
 FUNCTION DynamicLabel {
     LOCAL PARAMETER Parent.
     PARAMETER Content.
-    Local PARAMETER LabelAlign is "".
+    Local PARAMETER LabelPrefix is "".
     SET Label to Parent:addlabel().
     SET Label:textupdater TO {
-        RETURN Content().
+        RETURN LabelPrefix + Content().
     }.
-    if NOT LabelAlign = "" {
-        set Label:style:align to LabelAlign.
-    }
     RETURN Label.
 }

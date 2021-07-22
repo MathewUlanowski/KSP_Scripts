@@ -33,6 +33,9 @@ WHEN ALT:radar < 70000 THEN {
     TOGGLE AG10.
 }
 
+WHEN ALT:radar < 5000 THEN{
+    CHUTES ON.
+}
 
 
 
@@ -73,7 +76,7 @@ WHEN ALT:RADAR < 50000 then {
             if ALT:radar < 25 {
                 GEAR ON.
                 LOCK STEERING to up.
-                LOCK THROTTLE TO Hover_Throttle(Velocity_TWR_Offset(-3)).
+                LOCK THROTTLE TO Hover_Throttle(Velocity_TWR_Offset(-1)).
             } ELSE {
                 LOCK THROTTLE TO 0.
             }
