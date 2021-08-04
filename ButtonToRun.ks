@@ -1,5 +1,7 @@
 set AllFiles to OPEN("0:/").
 
+PARAMETER Handup is FALSE.
+
 SET COMPLETED TO FALSE.
 
 ON AG9 {
@@ -16,18 +18,20 @@ SET ButtonGUI to GUI(325, 200).
 SET SB TO ButtonGUI:addscrollbox().
 
 for item in AllFiles:list:values {
-    IF NOT (item = ".gitignore") {
-        print item.
-        CreateStaticButton(
+    IF NOT (item = ".gitignore") 
+    AND NOT (item = ".git") 
+    AND not (item = "boot")
+    AND NOT (item = "Libs"){
+        LOCAL ItemIter to item.
+        CreateButton(
             SB,
-            // item
             item,
             {
-                LOCAL IterItem to item.
-                RUNPATH(IterItem).
+                RUNPATH(ItemIter).
             }
         ).
-    }    
+    }
 }
 ButtonGUI:show().
-WAIT UNTIL COMPLETED.
+WAIT UNTIL COMPLETED or Handup.
+CLEARGUIS().

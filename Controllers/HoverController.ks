@@ -1,11 +1,29 @@
 
 stage.
 // Import the functions from the HoverLib
-run HoverLib.
+RUNPATH("0:/import", "0:/Libs/HoverLib").
+RUNPATH("0:/import", "0:/Libs/GUImaker").
+
+
 
 // optional parameter to set the desired altitude upon calling the function
 PARAMETER DesiredAltitude is 0.
 
+// Booleen tells weather or not to activate the steering controller this allows a higher scope to control the steering if for instance its being used for landing or something
+PARAMETER SteeringMode is TRUE.
+if SteeringMode {
+    RUNPATH("0:/Controllers/steeringController").
+}
+
+// abort trigger is something to be passed in that if triggered will cause the program to end it should take a function.
+// ExitCondition must be set to true in your higer scope for it to end the script
+PARAMETER AbortTrigger is {
+    set ExitCondition to TRUE.
+    RETURN TRUE.
+}.
+AbortTrigger().
+
+PARAMETER LandingMode is False.
 // hovermode tells the program weather it is in Sea Level or Radar Mode
 PARAMETER HoverMode is 1.
 
@@ -13,9 +31,8 @@ PARAMETER HoverMode is 1.
 PARAMETER AltLock IS false.
 
 // sets landing mode to false by default once this is triggered it cannot be untriggered
-set LandingMode to FALSE.
 
-Local ExitCondition to FALSE.
+Set ExitCondition to FALSE.
 
 set Tilt to 85.
 
@@ -27,12 +44,30 @@ LOCAL AngleChangeHolder to {
 // GUI controller
 // most if not all of displayed values are displayed asynchronousely so ti will update as the value updates
 LOCAL HoverGui is GUI(400).
-LOCAL Header is HoverGui:addlabel("Hover GUI").
-    set Header:style:align to "CENTER".
-    set Header:style:hstretch to TRUE.
+
+set Header to StaticLabel(HoverGui, "Hover Info").
+set Header:style:align to "CENTER".
+set Header:style:hstretch to TRUE.
+
+
+// LOCAL Header is HoverGui:addlabel("Hover GUI").
+//     set Header:style:align to "CENTER".
+//     set Header:style:hstretch to TRUE.
 // displays the current altitude on the GUI 
-LOCAL TargetAlt is HoverGui:addlabel("Target ALT: " + round(DesiredAltitude,5)).
-set TargetAlt:textupdater to {RETURN "Target ALT: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).}.
+set AltInput to CreateTextField(
+    HoverGui,
+    {
+        LOCAL parameter input is 0.
+        set DesiredAltitude@ to input:tonumber().
+        RETURN true.
+    },
+    DesiredAltitude:tostring()
+).
+DynamicLabel(HoverGui, {
+    RETURN "Target Alt: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).
+}).
+// LOCAL TargetAlt is HoverGui:addlabel("Target ALT: " + round(DesiredAltitude,5)).
+// set TargetAlt:textupdater to {RETURN "Target ALT: " + round(ALT:radar) + "/" + round(DesiredAltitude,5).}.
 // shows the altitude mode 
 LOCAL ModeLabel is HoverGui:addlabel("Mode: ").
 set ModeLabel:textupdater to {
@@ -132,8 +167,7 @@ on AG5 {
 // repeating loop controlling the craft and its TWR and thrust to keep it hovering
 until ExitCondition {
     CLEARSCREEN.
-
-    set TWR to (THROTTLE * SHIP:MAXTHRUST)/ ship:MASS/(CONSTANT:g*(ship:body:mass/((ship:body:distance)^2))).
+    set TWR to (THROTTLE * SHIP:availablethrust)/ ship:MASS/(CONSTANT:g*(ship:body:mass/((ship:body:distance)^2))).
 
     // [WIP] detects if the brakes are on and attemts to arrest all horizontal velocity if they are
     if(BRAKES){
@@ -159,10 +193,6 @@ until ExitCondition {
             }
         }
     }
-    else {
-        UNLOCK steering.
-        CLEARVECDRAWS().
-    }
 
     // runs from the external lib functions
     if((VELOCITY:surface:mag > 1700) and (LandingMode = TRUE) and (ALTITUDE < 70000)){
@@ -175,3 +205,4 @@ until ExitCondition {
 
 HoverGui:hide().
 HoverGui:dispose().
+CLEARGUIS().
